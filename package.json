@@ -8,9 +8,16 @@
     "start": "next start"
   },
   "dependencies": {
+    "@google/genai": "^1.32.0",
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.13.2",
+    "firebase": "^12.7.0",
     "next": "16.0.8",
     "react": "19.2.1",
-    "react-dom": "19.2.1"
+    "react-dom": "19.2.1",
+    "react-hook-form": "^7.68.0",
+    "sonner": "^2.0.7",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
