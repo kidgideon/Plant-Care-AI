@@ -1,0 +1,132 @@
+.plantsSection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 95%;
+  margin: 10px 0px;
+}
+
+.header {
+  margin-bottom: 1rem;
+  width: 100%;
+  text-align: start;
+}
+
+.title {
+  font-size: 180%;
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+.subtitle {
+  font-size: 100%;
+  color: var(--color-text-muted);
+}
+
+.grid {
+ width: 100%;
+ display: flex;
+ justify-content: start;
+ flex-direction: row;
+ align-items: center;
+ gap: 20px;
+ flex-wrap: wrap;
+}
+
+/* Card */
+.card {
+  background-color: var(--color-bg-card);
+  width: 100%;
+  max-width: 300px;
+  border-radius: 14px;
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+/* Image */
+.imageWrapper {
+  width: 100%;
+  height: 140px;
+  overflow: hidden;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Content */
+.content {
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.plantName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+/* Status + score */
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+.healthy {
+  background-color: rgba(46, 125, 50, 0.15);
+  color: var(--color-success);
+}
+
+.warning {
+  background-color: rgba(249, 168, 37, 0.15);
+  color: var(--color-warning);
+}
+
+.danger {
+  background-color: rgba(198, 40, 40, 0.15);
+  color: var(--color-error);
+}
+
+.score {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+/* Button */
+.button {
+  margin-top: 0.4rem;
+  padding: 0.45rem;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--color-primary);
+  color: white;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.button:hover {
+  background-color: var(--color-primary-soft);
+}

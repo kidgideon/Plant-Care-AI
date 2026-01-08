@@ -29,3 +29,28 @@
 .dateTag {
     color: var(--color-text-muted);
 }
+
+.chartArea {
+    width: 95%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.ChartOne {
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.chartTwo {
+   width: 40%;
+   display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}

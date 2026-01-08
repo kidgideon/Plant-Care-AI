@@ -3,6 +3,8 @@ import Navbar from "../../components/navbar/navbar";
 import SummaryCard from "../../components/summary/summaryCards";
 import HealthStatusChart from "../../components/dashboardCharts/healthstatuschart";
 import HealthScoreTrend from "../../components/dashboardCharts/healthscoretrend";
+import PlantArea from "../../components/plantsArea/plantsArea";
+import Blob from "../../components/aiBlob/blob";
 const Dashboard = () => {
     return(
         <div className={styles.interface}>
@@ -15,9 +17,15 @@ const Dashboard = () => {
             </div>
             <SummaryCard/>
             <div className={styles.chartArea}>
-            <HealthStatusChart/>
-            <HealthScoreTrend/>
+                <div className={styles.ChartOne}>
+                  <HealthScoreTrend/>
+                </div>
+                <div className={styles.chartTwo}>
+                      <HealthStatusChart/>
+                </div>
             </div>
+            <PlantArea/>
+            <Blob/>
         </div>
     )
 }

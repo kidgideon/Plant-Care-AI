@@ -12,6 +12,7 @@
     border-bottom: 1px solid rgb(241, 241, 241);
     background-color: var(--color-bg-main);
     color: var(--color-text-main);
+    z-index: 900;
 }
 
 .logoArea {
