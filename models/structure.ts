@@ -2,7 +2,6 @@ import type { Timestamp } from "firebase/firestore";
 
 // users/${uid}/
 export type User = {
-  id: string;
   fullName: string;
   email: string;
   role: "farmer";
@@ -14,7 +13,6 @@ export type User = {
 export type PlantStatus = "new" | "improving" | "declining" | "stable";
 
 export type Plant = {
-  id: string;
   cropName: string;
   botanicalName?: string;
   createdAt: Timestamp;
@@ -49,7 +47,6 @@ export type PlantIdentification = {
 
 // users/${uid}/plants/${plantId}/analyses/${analysisId}
 export type PlantAnalysis = {
-  id: string;
   imageUrl: string;
   plantIdentification: PlantIdentification;
   possibleDiseases: DiseaseDetection[];

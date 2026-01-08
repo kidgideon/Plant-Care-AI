@@ -1,3 +1,36 @@
+/* An Intelligent System for Crop Health Monitoring and Disease Detection */
+
+:root {
+  /* Brand / Base */
+  --color-primary: #1B5E20;        /* Deep agricultural green */
+  --color-primary-soft: #2E7D32;   /* Lighter green for hover / highlights */
+
+  /* Backgrounds */
+  --color-bg-main: #F9FBF8;        /* Clean off-white (easy on the eyes) */
+  --color-bg-card: #FFFFFF;        /* Cards / panels */
+  --color-bg-muted: #EEF3EE;       /* Section separators */
+
+  /* Accent */
+  --color-accent: #F9A825;         /* Amber (alerts, confidence, disease markers) */
+  --color-accent-soft: #FFF3CD;    /* Soft amber background */
+
+  /* Text */
+  --color-text-main: #1E1E1E;      /* Primary readable text */
+  --color-text-muted: #6B7280;     /* Secondary / muted text */
+
+  /* Status */
+  --color-success: #2E7D32;        /* Healthy crop */
+  --color-warning: #F9A825;        /* Moderate issue */
+  --color-error: #C62828;          /* Disease detected */
+
+  /* Borders & Lines */
+  --color-border: #D1D5DB;
+  --color-border-soft: #E5E7EB;
+
+  /* Shadows */
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
 
 body {
     margin: 0px;
@@ -16,3 +49,4 @@ body {
 a {
     text-decoration: none;
 }
+
