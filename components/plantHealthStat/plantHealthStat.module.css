@@ -1,0 +1,50 @@
+.container {
+  width: 95%;
+  margin: 20px auto;
+  background-color: var(--color-bg-card);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+.charts {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.chartBox {
+  width: 100%;
+}
+
+.chartTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin-bottom: 8px;
+}
+
+/* Responsive layout */
+@media (min-width: 768px) {
+  .charts {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .chartBox {
+    width: 48%;
+  }
+}

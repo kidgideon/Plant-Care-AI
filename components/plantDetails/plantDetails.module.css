@@ -1,0 +1,87 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  border-radius: 12px;
+  gap: 24px;
+}
+
+@media(min-width: 768px) {
+  .container {
+    flex-direction: row;
+  }
+}
+
+.imageSection {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image {
+  max-width: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.detailsSection {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.name {
+  font-size: 2rem;
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.botanical {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1rem;
+  padding: 8px 0;
+}
+
+.label {
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.value {
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.status {
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+/* Status colors */
+.statusStable {
+  background: var(--color-bg-muted);
+  color: var(--color-text-main);
+}
+
+.statusHealthy {
+  background: var(--color-success);
+  color: white;
+}
+
+.statusWarning {
+  background: var(--color-warning);
+  color: white;
+}
