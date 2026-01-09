@@ -25,7 +25,6 @@ export const addNewPlantWithAnalysis = async ( userId: string, cropName: string,
 
   // Create Plant
   const plant: Plant = {
-    id: plantId,
     cropName,
     botanicalName,
     createdAt: Timestamp.now(),
@@ -37,7 +36,6 @@ export const addNewPlantWithAnalysis = async ( userId: string, cropName: string,
   // Create first analysis
   const analysisId = uuidv4();
   const firstAnalysis: PlantAnalysis = {
-    id: analysisId,
     imageUrl,
     plantIdentification: analysisData.plant_identification,
     possibleDiseases: analysisData.possible_diseases,
@@ -78,7 +76,6 @@ export const addAnalysisToExistingPlant = async (
   // Build new analysis
   const analysisId = uuidv4();
   const newAnalysis: PlantAnalysis = {
-    id: analysisId,
     imageUrl,
     plantIdentification: analysisData.plant_identification,
     possibleDiseases: analysisData.possible_diseases,
