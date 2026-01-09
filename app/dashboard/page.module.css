@@ -8,6 +8,7 @@
     padding-top: 70px;
     background-color: var(--color-bg-main);
     padding-bottom: 30px;
+    overflow: hidden;
 }
 
 
@@ -53,4 +54,20 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+}
+
+
+/* Responsive for smaller screens */
+@media (max-width: 600px) {
+   .chartArea {
+    flex-direction: column-reverse;
+    
+   }
+   .ChartOne {
+    width: 100%;
+   }
+
+   .chartTwo {
+    width: 100%;
+   }
 }

@@ -1,10 +1,10 @@
 .blobWrapper {
   position: fixed;
-  bottom: 0px; /* grounded, slightly peeking */
+  bottom: 5px; /* grounded, slightly peeking */
   left: 50%;
   transform: translateX(-50%);
-  width: 140px;
-  height: 140px;
+  width: 120px;
+  height: 120px;
   pointer-events: none;
   z-index: 0;
   cursor: pointer;

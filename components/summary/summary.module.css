@@ -1,14 +1,15 @@
 .interface {
- width: 97%;
- display: flex;
- justify-content: space-around;
- flex-direction: row;
- flex-wrap: wrap;
- align-items: center;
- gap: 10px;
- padding: 20px 0px;
+  width: 97%;
+  display: flex;
+  justify-content: space-around;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 15px;
+  padding: 20px 0px;
 }
 
+/* Individual card */
 .card {
   background-color: var(--color-bg-card);
   width: 100%;
@@ -47,4 +48,30 @@
   font-weight: bold;
   color: var(--color-text-main);
   margin: 0;
+}
+
+
+
+/* Responsive for smaller screens */
+@media (max-width: 900px) {
+ .card {
+  max-width: 120px;
+ }
+}
+
+
+/* Responsive for smaller screens */
+@media (max-width: 600px) {
+ .card {
+  max-width: 140px;
+ }
+ 
+}
+
+
+/* Responsive for smaller screens */
+@media (max-width: 400px) {
+ .card {
+  max-width: 120px;
+ }
 }

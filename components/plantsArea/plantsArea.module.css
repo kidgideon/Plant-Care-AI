@@ -130,3 +130,16 @@
 .button:hover {
   background-color: var(--color-primary-soft);
 }
+
+
+/* Responsive for smaller screens */
+@media (max-width: 600px) {
+  .grid {
+    justify-content: center;
+  }
+
+  .card {
+    width: 95%;
+    max-width: 450px;
+  }
+}
