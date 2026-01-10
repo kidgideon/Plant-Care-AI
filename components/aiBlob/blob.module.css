@@ -86,3 +86,111 @@
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.08); }
 }
+
+/* =========================
+   PICKER OVERLAY
+   ========================= */
+
+.pickerOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 30, 30, 0.45); /* neutral dim */
+  backdrop-filter: blur(2px);
+  z-index: 999;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* =========================
+   BOTTOM PANEL (ALWAYS WHITE)
+   ========================= */
+
+.picker {
+  width: 100%;
+  max-width: 420px;
+
+  background: var(--color-bg-card); /* ALWAYS white */
+  border-radius: 18px 18px 0 0;
+
+  padding: 20px;
+  box-shadow: var(--shadow-soft);
+
+  animation: slideUp 0.25s ease-out;
+}
+
+/* =========================
+   ACTION BUTTONS
+   ========================= */
+
+.picker button {
+  width: 100%;
+  border: 1px solid var(--color-border-soft);
+  background: var(--color-bg-main);
+  border-radius: 14px;
+
+  padding: 14px 16px;
+  margin-bottom: 12px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-main);
+
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.1s ease;
+}
+
+.picker button:last-child {
+  margin-bottom: 0;
+}
+
+/* Icon styling */
+.picker svg {
+  font-size: 18px;
+  color: var(--color-primary);
+}
+
+/* Hover / Active */
+.picker button:hover {
+  background: var(--color-bg-muted);
+  border-color: var(--color-border);
+}
+
+.picker button:active {
+  transform: scale(0.98);
+}
+
+/* =========================
+   ANIMATION
+   ========================= */
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* =========================
+   DESKTOP BEHAVIOR
+   ========================= */
+
+@media (min-width: 768px) {
+  .pickerOverlay {
+    align-items: center;
+  }
+
+  .picker {
+    border-radius: 18px;
+  }
+}

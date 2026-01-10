@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaCamera, FaImages } from "react-icons/fa";
 import { toast } from "sonner";
 
 import styles from "./blob.module.css";
@@ -20,13 +20,16 @@ interface BlobProps {
 
 const Blob = ({ plantId }: BlobProps) => {
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
 
   /* =========================
-     AUTH LISTENER
+     AUTH
      ========================= */
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
@@ -36,14 +39,9 @@ const Blob = ({ plantId }: BlobProps) => {
   }, []);
 
   /* =========================
-     FILE HANDLER
+     FILE PROCESSOR (shared)
      ========================= */
-  const handleFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const processFile = async (file: File) => {
     if (!userId) {
       toast.error("Sign in first");
       return;
@@ -51,6 +49,7 @@ const Blob = ({ plantId }: BlobProps) => {
 
     try {
       setLoading(true);
+      setShowPicker(false);
 
       let finalPlantId: string;
 
@@ -63,8 +62,6 @@ const Blob = ({ plantId }: BlobProps) => {
       }
 
       toast.success("Analysis completed");
-
-      // Force page data refresh even on same route
       router.replace(`/plant/${finalPlantId}`);
       router.refresh();
     } catch (err: any) {
@@ -72,43 +69,87 @@ const Blob = ({ plantId }: BlobProps) => {
       toast.error(err?.message || "Analysis failed");
     } finally {
       setLoading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      if (cameraInputRef.current) cameraInputRef.current.value = "";
+      if (galleryInputRef.current) galleryInputRef.current.value = "";
     }
   };
 
   /* =========================
-     CLICK HANDLER
+     INPUT HANDLERS
      ========================= */
-  const handleClick = () => {
+  const onCameraChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  };
+
+  const onGalleryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  };
+
+  /* =========================
+     UI HANDLERS
+     ========================= */
+  const handleMainClick = () => {
     if (!userId) {
       toast.error("Sign in first");
       return;
     }
-    if (!loading) fileInputRef.current?.click();
+    if (!loading) setShowPicker(true);
   };
 
   return (
     <>
-      {/* Hidden file input */}
+      {/* Camera input */}
       <input
-        ref={fileInputRef}
+        ref={cameraInputRef}
         type="file"
         accept="image/*"
-        onChange={handleFileChange}
-        style={{ display: "none" }}
+        capture="environment"
+        onChange={onCameraChange}
+        hidden
       />
 
-      {/* Floating Blob Button */}
+      {/* Gallery input */}
+      <input
+        ref={galleryInputRef}
+        type="file"
+        accept="image/*"
+        onChange={onGalleryChange}
+        hidden
+      />
+
+      {/* Floating Blob */}
       <div
         className={`${styles.blobWrapper} ${loading ? styles.disabled : ""}`}
-        onClick={handleClick}
+        onClick={handleMainClick}
       >
         <div className={styles.blob}>
           <FaPlus className={styles.plusIcon} />
         </div>
       </div>
 
-      {/* Loading Overlay */}
+      {/* Picker Overlay */}
+      {showPicker && !loading && (
+        <div className={styles.pickerOverlay} onClick={() => setShowPicker(false)}>
+          <div
+            className={styles.picker}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button onClick={() => cameraInputRef.current?.click()}>
+              <FaCamera />
+              <span>Take Photo</span>
+            </button>
+
+            <button onClick={() => galleryInputRef.current?.click()}>
+              <FaImages />
+              <span>Choose from Gallery</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Loading */}
       {loading && (
         <div className={styles.spinnerWrapper}>
           <Spinner />
