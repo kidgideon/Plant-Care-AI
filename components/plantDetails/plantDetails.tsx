@@ -93,8 +93,11 @@ const PlantDetails = ({ plantId }: PlantDetailsProps) => {
           <p className={styles.plantName}>{plant.cropName}</p>
           {plant.botanicalName && (
             <p className={styles.botName}>
-              {plant.botanicalName} <span className={styles.plantStatus}>{plant.status.toUpperCase()}</span>
-            </p>
+  {plant.botanicalName}{" "}
+  <span className={`${styles.plantStatus} ${styles[plant.status]}`}>
+    {plant.status.charAt(0).toUpperCase() + plant.status.slice(1)}
+  </span>
+</p>
           )}
 
           <div className={styles.extraData}>

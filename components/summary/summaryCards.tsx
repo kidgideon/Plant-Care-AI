@@ -8,13 +8,20 @@ import { collection, getDocs } from "firebase/firestore";
 import styles from "./summary.module.css";
 import type { Plant, PlantStatus } from "../../models/structure";
 
+interface Summary {
+  total: number;
+  healthy: number;
+  stable: number;
+  unhealthy: number;
+}
+
 const SummaryCard = () => {
   const [loading, setLoading] = useState(true);
-  const [summary, setSummary] = useState({
+  const [summary, setSummary] = useState<Summary>({
     total: 0,
     healthy: 0,
     stable: 0,
-    declining: 0,
+    unhealthy: 0,
   });
 
   useEffect(() => {
@@ -26,11 +33,11 @@ const SummaryCard = () => {
         const plants: Plant[] = plantSnapshots.docs.map((doc) => doc.data() as Plant);
 
         const total = plants.length;
-        const healthy = plants.filter((p) => p.status === "new" || p.status === "improving").length;
+        const healthy = plants.filter((p) => p.status === "healthy" || p.status === "improving").length;
         const stable = plants.filter((p) => p.status === "stable").length;
-        const declining = plants.filter((p) => p.status === "declining").length;
+        const unhealthy = plants.filter((p) => p.status === "unhealthy" || p.status === "declining").length;
 
-        setSummary({ total, healthy, stable, declining });
+        setSummary({ total, healthy, stable, unhealthy });
       } catch (err) {
         console.error("Failed to fetch plants:", err);
       } finally {
@@ -40,7 +47,7 @@ const SummaryCard = () => {
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) fetchPlants(user.uid);
-      else setLoading(false); // not signed in
+      else setLoading(false);
     });
 
     return () => unsubscribe();
@@ -50,7 +57,7 @@ const SummaryCard = () => {
     { title: "Total Plants", value: summary.total, icon: <FaLeaf />, color: "var(--color-primary)" },
     { title: "Healthy", value: summary.healthy, icon: <FaCheckCircle />, color: "var(--color-success)" },
     { title: "Stable", value: summary.stable, icon: <FaExclamationTriangle />, color: "var(--color-warning)" },
-    { title: "Declining", value: summary.declining, icon: <FaTimesCircle />, color: "var(--color-error)" },
+    { title: "Unhealthy", value: summary.unhealthy, icon: <FaTimesCircle />, color: "var(--color-error)" },
   ];
 
   return (

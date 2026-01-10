@@ -10,7 +10,7 @@ export type User = {
 };
 
 // users/${uid}/plants/${plantId}
-export type PlantStatus = "new" | "improving" | "declining" | "stable";
+export type PlantStatus = "healthy" | "unhealthy" | "improving" | "declining" | "stable";
 
 export type Plant = {
   cropName: string;

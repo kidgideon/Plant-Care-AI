@@ -129,7 +129,7 @@ const PlantHealthStats = ({ plantId }: Props) => {
           label: "Overall Health Score",
           data: analyses.map((a) => a.overallHealthScore),
           fill: true,
-          backgroundColor: "rgba(46,125,50,0.2)",
+          backgroundColor: "rgba(46,125,50,0.35)",
           borderColor: "var(--color-primary)",
           tension: 0.3,
           pointRadius: 4,

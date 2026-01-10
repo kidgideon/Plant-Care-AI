@@ -6,15 +6,19 @@ import { auth, db } from "../../firebase/client";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, getDocs } from "firebase/firestore";
 import styles from "./charts.module.css";
-import type { Plant } from "../../models/structure";
+import type { Plant, PlantStatus } from "../../models/structure";
 
-const COLORS = ["var(--color-success)", "var(--color-warning)", "var(--color-error)"];
+const COLORS = [
+  "var(--color-success)", // Healthy / Improving
+  "var(--color-primary)", // Stable
+  "var(--color-warning)", // Unhealthy / Declining
+];
 
 const HealthStatusChart = () => {
   const [data, setData] = useState([
     { name: "Healthy", value: 0 },
     { name: "Stable", value: 0 },
-    { name: "Declining", value: 0 },
+    { name: "Unhealthy", value: 0 },
   ]);
 
   const [loading, setLoading] = useState(true);
@@ -27,14 +31,14 @@ const HealthStatusChart = () => {
 
         const plants: Plant[] = plantSnapshots.docs.map((doc) => doc.data() as Plant);
 
-        const healthy = plants.filter((p) => p.status === "new" || p.status === "improving").length;
+        const healthy = plants.filter((p) => p.status === "healthy" || p.status === "improving").length;
         const stable = plants.filter((p) => p.status === "stable").length;
-        const declining = plants.filter((p) => p.status === "declining").length;
+        const unhealthy = plants.filter((p) => p.status === "unhealthy" || p.status === "declining").length;
 
         setData([
           { name: "Healthy", value: healthy },
           { name: "Stable", value: stable },
-          { name: "Declining", value: declining },
+          { name: "Unhealthy", value: unhealthy },
         ]);
       } catch (err) {
         console.error("Failed to fetch plants:", err);
@@ -51,7 +55,6 @@ const HealthStatusChart = () => {
     return () => unsubscribe();
   }, []);
 
-  // Optional: show skeleton placeholder while loading
   if (loading) {
     return (
       <div className={styles.chartContainer}>
