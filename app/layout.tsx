@@ -11,7 +11,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata = {
-  title: "PlantSight - Signup",
+  title: "PlantSight - An Intelligent System for Crop Health Monitoring and Disease Detection ",
   description: "Signup to PlantSight to start monitoring your plants",
   icons: {
     icon: "/logo.png",

@@ -25,7 +25,7 @@ const PreviousAnalyses = ({ plantId }: Props) => {
 
       try {
         const ref = collection(db, "users", user.uid, "plants", plantId, "analyses");
-        const q = query(ref, orderBy("createdAt", "asc")); // Ascending to compare previous score
+        const q = query(ref, orderBy("createdAt", "desc")); // Descending to show most recent first
         const snap = await getDocs(q);
 
         const data = snap.docs.map((doc) => doc.data() as PlantAnalysis);
@@ -76,6 +76,7 @@ const PreviousAnalyses = ({ plantId }: Props) => {
       <table className={styles.table}>
         <thead>
           <tr>
+            <th>#</th>
             <th>Date</th>
             <th>Status</th>
             <th>Health Score</th>
@@ -83,11 +84,14 @@ const PreviousAnalyses = ({ plantId }: Props) => {
         </thead>
         <tbody>
           {analyses.map((a, idx) => {
-            const previousScore = idx > 0 ? analyses[idx - 1].overallHealthScore : undefined;
+            // Since analyses are ordered descending (most recent first),
+            // compare with the older analysis (which comes after in the array)
+            const previousScore = idx < analyses.length - 1 ? analyses[idx + 1].overallHealthScore : undefined;
             const status = computeStatus(a.overallHealthScore, previousScore);
 
             return (
               <tr key={idx}>
+                <td>{idx + 1}</td>
                 <td>{a.createdAt.toDate().toLocaleDateString()}</td>
                 <td style={{ color: status.color }}>{status.label}</td>
                 <td>{a.overallHealthScore}%</td>

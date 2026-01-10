@@ -12,10 +12,14 @@ import { toast } from "sonner";
 /**
  * Utility: Generate display picture URL safely
  */
-const generateDpUrl = (fullName: string) => {
+export const generateDpUrl = (fullName: string) => {
   const letter = fullName?.trim()?.charAt(0)?.toUpperCase() || "U";
-  return `https://ui-avatars.com/api/?name=${letter}&background=random&size=128`;
+
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(
+    letter
+  )}&size=128&background=1B5E20&color=FFFFFF&format=png`;
 };
+
 
 /**
  * SIGNUP

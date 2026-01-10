@@ -22,10 +22,12 @@ const PlantArea = () => {
         const plantsRef = collection(db, "users", uid, "plants");
         const plantSnapshots = await getDocs(plantsRef);
 
-        const fetchedPlants: (Plant & { plantId: string })[] = plantSnapshots.docs.map((doc) => ({
-          plantId: doc.id,
-          ...(doc.data() as Plant),
-        }));
+        const fetchedPlants: (Plant & { plantId: string })[] = plantSnapshots.docs
+          .map((doc) => ({
+            plantId: doc.id,
+            ...(doc.data() as Plant),
+          }))
+          .sort((a, b) => b.latestAnalysisAt.toMillis() - a.latestAnalysisAt.toMillis());
 
         setPlants(fetchedPlants);
       } catch (err) {

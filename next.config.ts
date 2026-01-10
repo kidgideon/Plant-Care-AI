@@ -3,7 +3,17 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactCompiler: true,
   images: {
-    domains: ["firebasestorage.googleapis.com"], // allow Firebase Storage images
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "firebasestorage.googleapis.com",
+      },
+      {
+        protocol: "https",
+        hostname: "ui-avatars.com",
+        pathname: "/api/**",
+      },
+    ],
   },
 };
 
