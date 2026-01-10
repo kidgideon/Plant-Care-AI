@@ -6,7 +6,7 @@ import { FaCalendarAlt, FaSyncAlt } from "react-icons/fa";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import { auth, db } from "../../firebase/client";
-import styles from "./plantdetails.module.css";
+import styles from "./plant-details.module.css";
 import placeholderImage from "../../images/9.jpg";
 import type { Plant } from "../../models/structure";
 
