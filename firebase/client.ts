@@ -6,11 +6,12 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAnalytics, isSupported, type Analytics } from "firebase/analytics";
 
+
 const firebaseConfig = {
   apiKey: "AIzaSyCG7d0afTpnkoKwPzV5QBGJCmbUX3tTWyk",
   authDomain: "ai-plant-health-analyser.firebaseapp.com",
   projectId: "ai-plant-health-analyser",
-  storageBucket: "ai-plant-health-analyser.appspot.com",
+  storageBucket: "ai-plant-health-analyser.firebasestorage.app",
   messagingSenderId: "963001024490",
   appId: "1:963001024490:web:baa314adefa78941317c93",
   measurementId: "G-C8PDBB29L9"

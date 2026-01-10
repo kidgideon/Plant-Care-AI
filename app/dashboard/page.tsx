@@ -5,16 +5,12 @@ import HealthStatusChart from "../../components/dashboardCharts/healthstatuschar
 import HealthScoreTrend from "../../components/dashboardCharts/healthscoretrend";
 import PlantArea from "../../components/plantsArea/plantsArea";
 import Blob from "../../components/aiBlob/blob";
+import WelcomeTag from "../../components/welcome/welcome";
 const Dashboard = () => {
     return(
         <div className={styles.interface}>
             <Navbar/>
-            <div className={styles.welcome_date}>
-       <p className={styles.welcomeTag}>
-            Hello, Gilbert Marguire
-        </p>
-        <p className={styles.dateTag}>january 6 Monday 2025</p>
-            </div>
+            <WelcomeTag/>
             <SummaryCard/>
             <div className={styles.chartArea}>
                 <div className={styles.ChartOne}>

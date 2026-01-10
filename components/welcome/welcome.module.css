@@ -1,0 +1,36 @@
+.welcomedate {
+ width: 95%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.welcomeTag {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.dateTag {
+  font-size: 1rem;
+  color: #666;
+}
+
+/* Skeleton effect */
+.skeletonText {
+  display: inline-block;
+  height: 1em;
+  width: 200px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #eee 25%, #ddd 50%, #eee 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

@@ -1,10 +1,7 @@
 .container {
   display: flex;
+  width: 97%;
   gap: 24px;
-  padding: 20px;
-  background-color: var(--color-bg-card);
-  border-radius: 12px;
-  box-shadow: var(--shadow-soft);
   flex-wrap: wrap;
 }
 
@@ -105,4 +102,42 @@
     flex-direction: column;
     gap: 16px;
   }
+}
+
+.skeletonPanel {
+  height: 260px;
+  border-radius: 12px;
+  background: linear-gradient(
+    90deg,
+    var(--color-skeleton) 25%,
+    var(--color-skeleton-highlight) 37%,
+    var(--color-skeleton) 63%
+  );
+  animation: shimmer 1.4s infinite;
+}
+
+.noDisease {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.safeIcon {
+  font-size: 42px;
+  color: var(--color-success);
+  margin-bottom: 0.75rem;
+}
+
+.safeText {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
 }

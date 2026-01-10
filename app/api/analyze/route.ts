@@ -101,10 +101,20 @@ Rules:
 
     /**
      * SAFE JSON PARSING
+     * Strip markdown code fences if present
      */
+    let jsonString = rawResponse.trim();
+    
+    // Remove markdown code fences (```json ... ``` or ``` ... ```)
+    if (jsonString.startsWith("```")) {
+      jsonString = jsonString
+        .replace(/^```(?:json)?\s*\n?/, "") // Remove opening fence
+        .replace(/\n?```\s*$/, ""); // Remove closing fence
+    }
+
     let parsed: any;
     try {
-      parsed = JSON.parse(rawResponse.trim());
+      parsed = JSON.parse(jsonString.trim());
     } catch {
       return NextResponse.json(
         { error: "AI returned invalid JSON", raw: rawResponse },

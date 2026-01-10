@@ -1,24 +1,16 @@
 "use client";
 
-import React from "react";
+import { useEffect, useState } from "react";
 import styles from "./diseaseRisk.module.css";
-import { FiAlertOctagon } from "react-icons/fi";
+import { FiAlertOctagon, FiShield } from "react-icons/fi";
+import { onAuthStateChanged } from "firebase/auth";
+import { collection, getDocs, orderBy, query, limit } from "firebase/firestore";
+import { auth, db } from "../../firebase/client";
+import type { PlantAnalysis } from "../../models/structure";
 
-// Fake data
-const mockDiseases = [
-  { name: "Leaf Blight", severity: 80, confidence: 92 },
-  { name: "Powdery Mildew", severity: 55, confidence: 75 },
-  { name: "Bacterial Spot", severity: 35, confidence: 60 },
-  { name: "Rust Fungus", severity: 20, confidence: 45 },
-];
-
-const mockCareRecommendations = [
-  "Water the plant thoroughly twice a week.",
-  "Apply nitrogen-rich fertilizer.",
-  "Prune dead leaves and stems.",
-  "Monitor for fungal infections.",
-  "Ensure proper sunlight exposure.",
-];
+interface Props {
+  plantId: string;
+}
 
 const getSeverityColor = (severity: number) => {
   if (severity >= 70) return "var(--color-error)";
@@ -26,27 +18,89 @@ const getSeverityColor = (severity: number) => {
   return "var(--color-success)";
 };
 
-const PlantAnalysisPanel = () => {
+const PlantAnalysisPanel = ({ plantId }: Props) => {
+  const [analysis, setAnalysis] = useState<PlantAnalysis | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  /* =========================
+     FETCH LATEST ANALYSIS
+     ========================= */
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (!user || !plantId) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const ref = collection(
+          db,
+          "users",
+          user.uid,
+          "plants",
+          plantId,
+          "analyses"
+        );
+
+        const q = query(ref, orderBy("createdAt", "desc"), limit(1));
+        const snap = await getDocs(q);
+
+        if (!snap.empty) {
+          setAnalysis(snap.docs[0].data() as PlantAnalysis);
+        }
+      } catch (e) {
+        console.error("Failed to fetch plant analysis", e);
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    return () => unsub();
+  }, [plantId]);
+
+  /* =========================
+     LOADING STATE
+     ========================= */
+  if (loading) {
+    return <div className={styles.skeletonPanel} />;
+  }
+
+  if (!analysis) {
+    return <p className={styles.empty}>No analysis data available.</p>;
+  }
+
+  const diseases = analysis.possibleDiseases || [];
+  const recommendations = analysis.careRecommendations || [];
+
   return (
     <div className={styles.container}>
-      {/* Disease Risk Bars */}
+      {/* ======================
+          DISEASE RISK
+         ====================== */}
       <div className={styles.column}>
         <h3 className={styles.title}>Disease Risk</h3>
-        {mockDiseases.length === 0 ? (
-          <p className={styles.empty}>No diseases detected.</p>
+
+        {diseases.length === 0 ? (
+          <div className={styles.noDisease}>
+            <FiShield className={styles.safeIcon} />
+            <p className={styles.safeText}>
+              No possible diseases detected.  
+              Plant appears stable based on the latest analysis.
+            </p>
+          </div>
         ) : (
           <div className={styles.list}>
-            {mockDiseases.map((disease, idx) => (
+            {diseases.map((d, idx) => (
               <div key={idx} className={styles.item}>
                 <div className={styles.label}>
-                  {disease.name} ({disease.confidence}%)
+                  {d.name} ({Math.round(d.confidence)}%)
                 </div>
                 <div className={styles.barBackground}>
                   <div
                     className={styles.bar}
                     style={{
-                      width: `${disease.severity}%`,
-                      backgroundColor: getSeverityColor(disease.severity),
+                      width: `${d.severity}%`,
+                      backgroundColor: getSeverityColor(d.severity),
                     }}
                   />
                 </div>
@@ -56,11 +110,13 @@ const PlantAnalysisPanel = () => {
         )}
       </div>
 
-      {/* Care Recommendations */}
+      {/* ======================
+          CARE RECOMMENDATIONS
+         ====================== */}
       <div className={styles.column}>
         <h3 className={styles.title}>Care Recommendations</h3>
         <ul className={styles.recommendations}>
-          {mockCareRecommendations.slice(0, 5).map((rec, idx) => (
+          {recommendations.slice(0, 5).map((rec, idx) => (
             <li key={idx} className={styles.recItem}>
               <FiAlertOctagon className={styles.icon} />
               <span>{rec}</span>

@@ -19,6 +19,7 @@ export type Plant = {
   latestHealthScore: number;
   latestAnalysisAt: Timestamp;
   status: PlantStatus;
+  image : string;
 };
 
 // shared
@@ -29,13 +30,13 @@ export type DiseaseDetection = {
 };
 
 export type HealthStats = {
-  colorHealth: number;
-  textureHealth: number;
-  diseaseRisk: number;
-  newGrowthVigor: number;
-  turgidityWilt: number;
-  canopyStructure: number;
-  spotLesionCount: number;
+  color_health: number;
+  texture_health: number;
+  disease_risk: number;
+  new_growth_vigor: number;
+  turgidity_wilt: number;
+  canopy_structure: number;
+  spot_lesion_count: number;
 };
 
 export type PlantIdentification = {

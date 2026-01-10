@@ -7,28 +7,8 @@
     flex-direction: column;
     padding-top: 70px;
     background-color: var(--color-bg-main);
-    padding-bottom: 30px;
+    padding-bottom: 80px;
     overflow: hidden;
-}
-
-
-.welcome_date {
-    width: 95%;
-    display: flex;
-    justify-content: center;
-    align-items: start;
-    flex-direction: column;
-    padding-top: 10px;
-}
-
-.welcomeTag {
-   color: var(--color-text-main);
-   font-weight: bold;
-   font-size: 180%;
-}
-
-.dateTag {
-    color: var(--color-text-muted);
 }
 
 .chartArea {
@@ -69,5 +49,9 @@
 
    .chartTwo {
     width: 100%;
+   }
+
+   .welcomeTag {
+    font-size: 140%;
    }
 }

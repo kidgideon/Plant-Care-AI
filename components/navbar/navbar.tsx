@@ -12,7 +12,7 @@ const Navbar = () => {
 </div>
 
 <div className={styles.ProfileArea}>
-    <div>  <FaUserCircle width={40}/></div>
+    <div className={styles.userArea}><FaUserCircle width={40}/></div>
 </div>
         </div>
     )

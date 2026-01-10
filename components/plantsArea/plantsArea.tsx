@@ -1,38 +1,48 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { FaLeaf } from "react-icons/fa";
-import { Timestamp } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+import { db, auth } from "../../firebase/client";
 import styles from "./plantsArea.module.css";
 import plantImage from "../../images/9.jpg";
-
-// Example mock data with full Plant type
-const mockPlants = [
-  {
-    cropName: "Tomato",
-    botanicalName: "Solanum lycopersicum",
-    createdAt: Timestamp.fromDate(new Date("2026-01-01")),
-    latestHealthScore: 85,
-    latestAnalysisAt: Timestamp.fromDate(new Date("2026-01-08")),
-    status: "improving",
-  },
-  {
-    cropName: "Maize",
-    botanicalName: "Zea mays",
-    createdAt: Timestamp.fromDate(new Date("2025-12-15")),
-    latestHealthScore: 62,
-    latestAnalysisAt: Timestamp.fromDate(new Date("2026-01-07")),
-    status: "declining",
-  },
-  {
-    cropName: "Pepper",
-    botanicalName: "Capsicum annuum",
-    createdAt: Timestamp.fromDate(new Date("2025-11-20")),
-    latestHealthScore: 38,
-    latestAnalysisAt: Timestamp.fromDate(new Date("2026-01-05")),
-    status: "new",
-  },
-];
+import type { Plant } from "../../models/structure";
 
 const PlantArea = () => {
+  const [plants, setPlants] = useState<(Plant & { plantId: string })[]>([]);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchPlants = async (uid: string) => {
+      try {
+        const plantsRef = collection(db, "users", uid, "plants");
+        const plantSnapshots = await getDocs(plantsRef);
+
+        const fetchedPlants: (Plant & { plantId: string })[] = plantSnapshots.docs.map((doc) => ({
+          plantId: doc.id,
+          ...(doc.data() as Plant),
+        }));
+
+        setPlants(fetchedPlants);
+      } catch (err) {
+        console.error("Failed to fetch plants:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) fetchPlants(user.uid);
+      else setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const getStatusClass = (status: string) => {
     switch (status) {
       case "improving":
@@ -47,6 +57,7 @@ const PlantArea = () => {
     }
   };
 
+  if (loading) {
   return (
     <section className={styles.plantsSection}>
       <div className={styles.header}>
@@ -55,21 +66,44 @@ const PlantArea = () => {
           Overview of all monitored crops and their current health status
         </p>
       </div>
+      <div className={styles.grid}>
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className={styles.skeletonCard}>
+            <div className={styles.skeletonImage}></div>
+            <div className={styles.skeletonRow}></div>
+            <div className={styles.skeletonRow}></div>
+            <div className={styles.skeletonRow}></div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 
-      {mockPlants.length === 0 ? (
+
+  return (
+    <section className={styles.plantsSection}>
+      <div className={styles.header}>
+        <h2 className={styles.title}>My Plants</h2>
+        <p className={styles.subtitle}>Overview of all monitored crops and their current health status</p>
+      </div>
+
+      {plants.length === 0 ? (
         <div className={styles.emptyState}>
           <FaLeaf size={48} color="var(--color-border)" />
           <p>No plants added yet</p>
         </div>
       ) : (
         <div className={styles.grid}>
-          {mockPlants.map((plant, index) => (
-            <div key={index} className={styles.card}>
+          {plants.map((plant) => (
+            <div key={plant.plantId} className={styles.card}>
               <div className={styles.imageWrapper}>
                 <Image
-                  src={plantImage}
+                  src={plant.image || plantImage}
                   alt={plant.cropName}
                   className={styles.image}
+                  width={100}
+                  height={100}
                 />
               </div>
 
@@ -79,22 +113,16 @@ const PlantArea = () => {
                   <h3 className={styles.plantName}>{plant.cropName}</h3>
                 </div>
 
-                {plant.botanicalName && (
-                  <p className={styles.botanical}>{plant.botanicalName}</p>
-                )}
+                {plant.botanicalName && <p className={styles.botanical}>{plant.botanicalName}</p>}
 
                 <div className={styles.row}>
                   <span className={styles.label}>Created At:</span>
-                  <span className={styles.value}>
-                    {plant.createdAt.toDate().toLocaleDateString()}
-                  </span>
+                  <span className={styles.value}>{plant.createdAt.toDate().toLocaleDateString()}</span>
                 </div>
 
                 <div className={styles.row}>
                   <span className={styles.label}>Last Analysis:</span>
-                  <span className={styles.value}>
-                    {plant.latestAnalysisAt.toDate().toLocaleDateString()}
-                  </span>
+                  <span className={styles.value}>{plant.latestAnalysisAt.toDate().toLocaleDateString()}</span>
                 </div>
 
                 <div className={styles.row}>
@@ -109,7 +137,12 @@ const PlantArea = () => {
                   </span>
                 </div>
 
-                <button className={styles.button}>View Analysis</button>
+                <button
+                  className={styles.button}
+                  onClick={() => router.push(`/plant/${plant.plantId}`)}
+                >
+                  View Analysis
+                </button>
               </div>
             </div>
           ))}

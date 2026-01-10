@@ -1,61 +1,116 @@
-import styles from "./plantDetails.module.css";
-import PlantImage from "../../images/9.jpg";
-import { Plant } from "../../models/structure";
-import { Timestamp } from "firebase/firestore";
+"use client";
 
-// Example fake plant data
-const fakePlant: Plant = {
-  cropName: "Tomato",
-  botanicalName: "Solanum lycopersicum",
-  createdAt: Timestamp.fromDate(new Date("2026-01-01")),
-  latestHealthScore: 85,
-  latestAnalysisAt: Timestamp.fromDate(new Date("2026-01-08")),
-  status: "improving",
-};
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { FaCalendarAlt, FaSyncAlt } from "react-icons/fa";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc, collection, getDocs } from "firebase/firestore";
+import { auth, db } from "../../firebase/client";
+import styles from "./plantdetails.module.css";
+import placeholderImage from "../../images/9.jpg";
+import type { Plant } from "../../models/structure";
 
-type PlantDetailsProps = {
-  plant?: Plant;
-};
+interface PlantDetailsProps {
+  plantId: string;
+}
 
-const PlantDetails: React.FC<PlantDetailsProps> = ({ plant = fakePlant }) => {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "new":
-      case "stable":
-        return styles.statusStable;
-      case "improving":
-        return styles.statusHealthy;
-      case "declining":
-        return styles.statusWarning;
-      default:
-        return styles.statusStable;
-    }
-  };
+const PlantDetails = ({ plantId }: PlantDetailsProps) => {
+  const [plant, setPlant] = useState<Plant | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [analysesCount, setAnalysesCount] = useState(0);
+
+  useEffect(() => {
+    const fetchPlant = async () => {
+      setLoading(true);
+      const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          setLoading(false);
+          return;
+        }
+
+        try {
+          const uid = user.uid;
+
+          // Fetch plant data
+          const plantRef = doc(db, "users", uid, "plants", plantId);
+          const plantSnap = await getDoc(plantRef);
+
+          if (plantSnap.exists()) {
+            setPlant(plantSnap.data() as Plant);
+
+            // Fetch analyses count
+            const analysesRef = collection(db, "users", uid, "plants", plantId, "analyses");
+            const analysesSnap = await getDocs(analysesRef);
+            setAnalysesCount(analysesSnap.size);
+          } else {
+            console.warn("Plant not found");
+          }
+        } catch (err) {
+          console.error("Error fetching plant:", err);
+        } finally {
+          setLoading(false);
+        }
+      });
+
+      return () => unsubscribe();
+    };
+
+    fetchPlant();
+  }, [plantId]);
+
+  if (loading) {
+    return (
+      <div className={styles.Interface}>
+        <div className={styles.detailsArea}>
+          <div className={styles.skeletonImage}></div>
+          <div className={styles.skeletonMeta}>
+            <div className={styles.skeletonRow}></div>
+            <div className={styles.skeletonRow}></div>
+            <div className={styles.skeletonRow}></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!plant) return <p>Plant not found.</p>;
 
   return (
-    <div className={styles.container}>
-      <div className={styles.imageSection}>
-        <img src={PlantImage.src} alt={plant.cropName} className={styles.image} />
-      </div>
-      <div className={styles.detailsSection}>
-        <h1 className={styles.name}>{plant.cropName}</h1>
-        {plant.botanicalName && <p className={styles.botanical}>{plant.botanicalName}</p>}
-
-        <div className={styles.row}>
-          <span className={styles.label}>Health Score:</span>
-          <span className={styles.value}>{plant.latestHealthScore}%</span>
+    <div className={styles.Interface}>
+      <div className={styles.detailsArea}>
+        <div className={styles.plantImg}>
+          <Image
+            src={plant.image || placeholderImage}
+            alt={plant.cropName}
+            className={styles.img}
+            width={200}
+            height={200}
+          />
+          <div className={styles.healthStatus}>{plant.latestHealthScore}%</div>
         </div>
 
-        <div className={styles.row}>
-          <span className={styles.label}>Last Analysis:</span>
-          <span className={styles.value}>{plant.latestAnalysisAt.toDate().toLocaleDateString()}</span>
-        </div>
+        <div className={styles.plantMeta}>
+          <p className={styles.plantName}>{plant.cropName}</p>
+          {plant.botanicalName && (
+            <p className={styles.botName}>
+              {plant.botanicalName} <span className={styles.plantStatus}>{plant.status.toUpperCase()}</span>
+            </p>
+          )}
 
-        <div className={styles.row}>
-          <span className={styles.label}>Status:</span>
-          <span className={`${styles.status} ${getStatusColor(plant.status)}`}>
-            {plant.status.toUpperCase()}
-          </span>
+          <div className={styles.extraData}>
+            <div className={styles.metaItem}>
+              <FaCalendarAlt className={styles.icon} />
+              <span>Created: {plant.createdAt.toDate().toLocaleDateString()}</span>
+            </div>
+            <div className={styles.metaItem}>
+              <FaCalendarAlt className={styles.icon} />
+              <span>Last Analysis: {plant.latestAnalysisAt.toDate().toLocaleDateString()}</span>
+            </div>
+            <div className={styles.metaItem}>
+              <FaSyncAlt className={styles.icon} />
+              <span>Analysis: {analysesCount}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
