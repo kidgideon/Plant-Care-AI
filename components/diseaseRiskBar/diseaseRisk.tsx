@@ -12,13 +12,25 @@ interface Props {
   plantId: string;
 }
 
+const MAX_SEVERITY = 10;
+
+/* =========================
+   SEVERITY HELPERS
+   ========================= */
 const getSeverityColor = (severity: number) => {
   if (severity >= 7) return "var(--color-error)";
-  if (severity >= 5) return "var(--color-warning)";
   if (severity >= 4) return "var(--color-warning)";
   return "var(--color-success)";
 };
 
+const getSeverityPercent = (severity: number) => {
+  const normalized = (severity / MAX_SEVERITY) * 100;
+  return Math.min(100, Math.max(0, normalized));
+};
+
+/* =========================
+   COMPONENT
+   ========================= */
 const PlantAnalysisPanel = ({ plantId }: Props) => {
   const [analysis, setAnalysis] = useState<PlantAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
@@ -27,7 +39,7 @@ const PlantAnalysisPanel = ({ plantId }: Props) => {
      FETCH LATEST ANALYSIS
      ========================= */
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user || !plantId) {
         setLoading(false);
         return;
@@ -49,29 +61,25 @@ const PlantAnalysisPanel = ({ plantId }: Props) => {
         if (!snap.empty) {
           setAnalysis(snap.docs[0].data() as PlantAnalysis);
         }
-      } catch (e) {
-        console.error("Failed to fetch plant analysis", e);
+      } catch (err) {
+        console.error("Failed to fetch plant analysis:", err);
       } finally {
         setLoading(false);
       }
     });
 
-    return () => unsub();
+    return () => unsubscribe();
   }, [plantId]);
 
   /* =========================
-     LOADING STATE
+     STATES
      ========================= */
-  if (loading) {
-    return <div className={styles.skeletonPanel} />;
-  }
-
-  if (!analysis) {
+  if (loading) return <div className={styles.skeletonPanel} />;
+  if (!analysis)
     return <p className={styles.empty}>No analysis data available.</p>;
-  }
 
-  const diseases = analysis.possibleDiseases || [];
-  const recommendations = analysis.careRecommendations || [];
+  const diseases = analysis.possibleDiseases ?? [];
+  const recommendations = analysis.careRecommendations ?? [];
 
   return (
     <div className={styles.container}>
@@ -85,28 +93,33 @@ const PlantAnalysisPanel = ({ plantId }: Props) => {
           <div className={styles.noDisease}>
             <FiShield className={styles.safeIcon} />
             <p className={styles.safeText}>
-              No possible diseases detected.  
-              Plant appears stable based on the latest analysis.
+              No possible diseases detected. Plant appears stable based on the
+              latest analysis.
             </p>
           </div>
         ) : (
           <div className={styles.list}>
-            {diseases.map((d, idx) => (
-              <div key={idx} className={styles.item}>
-                <div className={styles.label}>
-                  {d.name} ({Math.round(d.confidence)}%)
+            {diseases.map((d, idx) => {
+              const width = getSeverityPercent(d.severity);
+
+              return (
+                <div key={idx} className={styles.item}>
+                  <div className={styles.label}>
+                    {d.name} ({Math.round(d.confidence)}%)
+                  </div>
+
+                  <div className={styles.barBackground}>
+                    <div
+                      className={styles.bar}
+                      style={{
+                        width: `${width}%`,
+                        backgroundColor: getSeverityColor(d.severity),
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className={styles.barBackground}>
-                  <div
-                    className={styles.bar}
-                    style={{
-                      width: `${d.severity}%`,
-                      backgroundColor: getSeverityColor(d.severity),
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
