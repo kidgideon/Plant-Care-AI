@@ -13,8 +13,8 @@ interface Props {
 }
 
 const getSeverityColor = (severity: number) => {
-  if (severity >= 70) return "var(--color-error)";
-  if (severity >= 40) return "var(--color-warning)";
+  if (severity >= 7) return "var(--color-error)";
+  if (severity >= 4) return "var(--color-warning)";
   return "var(--color-success)";
 };
 
