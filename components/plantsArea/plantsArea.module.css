@@ -213,3 +213,31 @@
     background-color: #e0e0e0;
   }
 }
+
+/* Delete button */
+.deleteBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.55);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  z-index: 2;
+}
+
+.deleteBtn:hover {
+  background: rgba(198, 40, 40, 0.85);
+}
+
+/* Ensure image wrapper can position delete icon */
+.imageWrapper {
+  position: relative;
+}
