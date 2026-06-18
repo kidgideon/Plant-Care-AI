@@ -1,47 +1,45 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-/**
- * AI MODEL INITIALIZATION
- * Pre-trained multimodal vision-language model
- */
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-const MODEL_VERSION = "gemini-1.5-flash";
+const genAI = new GoogleGenerativeAI(
+  process.env.GEMINI_API_KEY!
+);
 
-/**
- * Utility: Clamp integer values safely into a fixed range
- */
-function clampInt(value: unknown, min = 1, max = 10): number {
-  if (!Number.isInteger(value)) return min;
-  return Math.min(Math.max(value as number, min), max);
+const MODEL_VERSION = "gemini-2.5-flash";
+
+function clampInt(
+  value: unknown,
+  min = 1,
+  max = 10
+): number {
+  const num = Number(value);
+
+  if (!Number.isInteger(num)) {
+    return min;
+  }
+
+  return Math.min(Math.max(num, min), max);
 }
 
-/**
- * POST /api/analyze-plant
- * Accepts a base64-encoded crop image and returns structured plant health analysis
- */
 export async function POST(req: NextRequest) {
   try {
-    /**
-     * INPUT VALIDATION
-     * Expecting base64-encoded image data (not a URL)
-     */
     const { imageBase64 } = await req.json();
 
     if (!imageBase64 || typeof imageBase64 !== "string") {
       return NextResponse.json(
-        { error: "Invalid or missing image data (base64 required)" },
+        {
+          error:
+            "Invalid or missing image data (base64 required)",
+        },
         { status: 400 }
       );
     }
 
-    /**
-     * PROMPT ENGINEERING
-     * Forces deterministic JSON output for safe parsing
-     */
     const prompt = `
 Return ONLY valid JSON.
-No markdown, no code fences, no text outside JSON.
+No markdown.
+No code fences.
+No explanations.
 
 {
   "plant_identification": {
@@ -70,19 +68,17 @@ No markdown, no code fences, no text outside JSON.
 }
 
 Rules:
-- Integers only (1–10)
-- Maximum of 5 care recommendations
-- If uncertain, return the lowest reasonable value
+- Integers only (1-10)
+- Maximum 5 care recommendations
+- If uncertain, return conservative estimates
 `;
 
-    /**
-     * AI INFERENCE
-     * Multimodal input: text + image
-     */
-    const model = genAI.getGenerativeModel({ model: MODEL_VERSION });
+    const model = genAI.getGenerativeModel({
+      model: MODEL_VERSION,
+    });
 
     const result = await model.generateContent([
-      { text: prompt },
+      prompt,
       {
         inlineData: {
           mimeType: "image/jpeg",
@@ -91,103 +87,135 @@ Rules:
       },
     ]);
 
-    const rawResponse = result.response?.text?.();
+    const rawResponse = result.response.text();
+
     if (!rawResponse) {
       return NextResponse.json(
-        { error: "Empty response from AI model" },
+        {
+          error: "Empty response from Gemini",
+        },
         { status: 500 }
       );
     }
 
-    /**
-     * SAFE JSON PARSING
-     * Strip markdown code fences if present
-     */
     let jsonString = rawResponse.trim();
-    
-    // Remove markdown code fences (```json ... ``` or ``` ... ```)
+
     if (jsonString.startsWith("```")) {
       jsonString = jsonString
-        .replace(/^```(?:json)?\s*\n?/, "") // Remove opening fence
-        .replace(/\n?```\s*$/, ""); // Remove closing fence
+        .replace(/^```(?:json)?\s*/, "")
+        .replace(/```$/, "")
+        .trim();
     }
 
     let parsed: any;
+
     try {
-      parsed = JSON.parse(jsonString.trim());
+      parsed = JSON.parse(jsonString);
     } catch {
       return NextResponse.json(
-        { error: "AI returned invalid JSON", raw: rawResponse },
+        {
+          error: "Gemini returned invalid JSON",
+          raw: rawResponse,
+        },
         { status: 500 }
       );
     }
 
-    /**
-     * STRUCTURE NORMALIZATION & VALIDATION
-     */
     const health = parsed.health_stats ?? {};
 
     const normalizedHealthMetrics = [
       clampInt(health.color_health),
       clampInt(health.texture_health),
-      clampInt(11 - clampInt(health.disease_risk)), // inverse risk
+      clampInt(
+        11 - clampInt(health.disease_risk)
+      ),
       clampInt(health.new_growth_vigor),
       clampInt(health.turgidity_wilt),
       clampInt(health.canopy_structure),
       clampInt(health.spot_lesion_count),
     ];
 
-    /**
-     * OVERALL HEALTH SCORE COMPUTATION
-     * Normalized to percentage (0–100)
-     */
-    const totalScore = normalizedHealthMetrics.reduce((a, b) => a + b, 0);
-    const overall_health_score = Math.round((totalScore / 70) * 100);
+    const totalScore = normalizedHealthMetrics.reduce(
+      (sum, value) => sum + value,
+      0
+    );
 
-    /**
-     * DISEASE & RECOMMENDATION SANITIZATION
-     */
-    const possible_diseases = Array.isArray(parsed.possible_diseases)
-      ? parsed.possible_diseases.slice(0, 5).map((d: any) => ({
-          name: String(d?.name ?? "Unknown"),
-          severity: clampInt(d?.severity),
-          confidence: clampInt(d?.confidence),
-        }))
+    const overall_health_score = Math.round(
+      (totalScore / 70) * 100
+    );
+
+    const possible_diseases = Array.isArray(
+      parsed.possible_diseases
+    )
+      ? parsed.possible_diseases
+          .slice(0, 5)
+          .map((d: any) => ({
+            name: String(d?.name ?? "Unknown"),
+            severity: clampInt(d?.severity),
+            confidence: clampInt(d?.confidence),
+          }))
       : [];
 
-    const care_recommendations = Array.isArray(parsed.care_recommendations)
-      ? parsed.care_recommendations.slice(0, 5).map(String)
+    const care_recommendations = Array.isArray(
+      parsed.care_recommendations
+    )
+      ? parsed.care_recommendations
+          .slice(0, 5)
+          .map(String)
       : [];
 
-    /**
-     * FINAL RESPONSE
-     * Combines AI inference + rule-based evaluation
-     */
     return NextResponse.json(
       {
-        plant_identification: parsed.plant_identification ?? null,
+        plant_identification:
+          parsed.plant_identification ?? null,
+
         possible_diseases,
+
         care_recommendations,
+
         health_stats: {
-          color_health: clampInt(health.color_health),
-          texture_health: clampInt(health.texture_health),
-          disease_risk: clampInt(health.disease_risk),
-          new_growth_vigor: clampInt(health.new_growth_vigor),
-          turgidity_wilt: clampInt(health.turgidity_wilt),
-          canopy_structure: clampInt(health.canopy_structure),
-          spot_lesion_count: clampInt(health.spot_lesion_count),
+          color_health: clampInt(
+            health.color_health
+          ),
+          texture_health: clampInt(
+            health.texture_health
+          ),
+          disease_risk: clampInt(
+            health.disease_risk
+          ),
+          new_growth_vigor: clampInt(
+            health.new_growth_vigor
+          ),
+          turgidity_wilt: clampInt(
+            health.turgidity_wilt
+          ),
+          canopy_structure: clampInt(
+            health.canopy_structure
+          ),
+          spot_lesion_count: clampInt(
+            health.spot_lesion_count
+          ),
         },
+
         overall_health_score,
+
         meta: {
           model_version: MODEL_VERSION,
-          evaluation_method: "rule-based aggregation",
+          evaluation_method:
+            "rule-based aggregation",
         },
       },
       { status: 200 }
     );
   } catch (err: any) {
+    console.error(err);
+
     return NextResponse.json(
-      { error: err?.message || "Internal server error" },
+      {
+        error:
+          err?.message ||
+          "Internal server error",
+      },
       { status: 500 }
     );
   }
