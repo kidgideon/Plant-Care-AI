@@ -6,7 +6,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
  * Pre-trained multimodal vision-language model
  */
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-const MODEL_VERSION = "gemini-2.0-flash";
+const MODEL_VERSION = "gemini-1.5-flash";
 
 /**
  * Utility: Clamp integer values safely into a fixed range
